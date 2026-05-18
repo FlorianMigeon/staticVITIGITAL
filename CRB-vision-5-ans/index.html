@@ -637,12 +637,23 @@
 
   <div class="winlose">
     <div class="winlose-card win">
-      <div class="winlose-title win">▲ Gagnants 4 ans (PDM Vol)</div>
+      <div class="winlose-title win">▲ Gagnants 4 ans · PDM Volume</div>
       <ul class="winlose-list" id="winners-list"></ul>
     </div>
     <div class="winlose-card lose">
-      <div class="winlose-title lose">▼ Perdants 4 ans (PDM Vol)</div>
+      <div class="winlose-title lose">▼ Perdants 4 ans · PDM Volume</div>
       <ul class="winlose-list" id="losers-list"></ul>
+    </div>
+  </div>
+
+  <div class="winlose">
+    <div class="winlose-card win">
+      <div class="winlose-title win">▲ Gagnants 4 ans · PDM Valeur</div>
+      <ul class="winlose-list" id="winners-val-list"></ul>
+    </div>
+    <div class="winlose-card lose">
+      <div class="winlose-title lose">▼ Perdants 4 ans · PDM Valeur</div>
+      <ul class="winlose-list" id="losers-val-list"></ul>
     </div>
   </div>
 
@@ -1134,30 +1145,65 @@ function renderPDMEvolution() {
     }
   });
 
-  // Winners / Losers (PDM Volume vs 2021)
-  const ranking = ranked.map(fab => {
+  // Winners / Losers : PDM Volume avec traduction en cols
+  const rankingVol = ranked.map(fab => {
     const m = GEO_DATA.fabricants[fab].metrics;
     const delta = (m.pdm[0] || 0) - (m.pdm[REF_IDX] || 0);
-    return { fab, name: FAB_NICE[fab] || fab, delta, pdm2025: m.pdm[0], pdmRef: m.pdm[REF_IDX] };
+    const deltaVol = (m.vol[0] || 0) - (m.vol[REF_IDX] || 0);
+    return { fab, name: FAB_NICE[fab] || fab, delta, deltaVol, pdm2025: m.pdm[0], pdmRef: m.pdm[REF_IDX] };
   }).sort((a, b) => b.delta - a.delta);
 
-  const winners = ranking.filter(r => r.delta > 0).slice(0, 5);
-  const losers  = ranking.filter(r => r.delta < 0).slice(-5).reverse();
+  const winVol = rankingVol.filter(r => r.delta > 0).slice(0, 5);
+  const losVol = rankingVol.filter(r => r.delta < 0).slice(-5).reverse();
+  const fmtSignedVolK = (v) => (v >= 0 ? '+' : '−') + fmtVolK(Math.abs(v)) + ' cols';
 
-  const winHtml = winners.map(r => `
+  const winVolHtml = winVol.map(r => `
     <li>
-      <span class="fab">${r.name}<span class="sub-info" style="margin-left:8px;">(${fmtPct(r.pdmRef, 1)} → ${fmtPct(r.pdm2025, 1)})</span></span>
+      <span class="fab">${r.name}<span class="sub-info" style="margin-left:8px;">(${fmtPct(r.pdmRef, 1)} → ${fmtPct(r.pdm2025, 1)} · ${fmtSignedVolK(r.deltaVol)})</span></span>
       <span class="delta pos">+${fmtNum(r.delta, 2)} pts</span>
     </li>
   `).join('');
-  const loseHtml = losers.map(r => `
+  const losVolHtml = losVol.map(r => `
     <li>
-      <span class="fab">${r.name}<span class="sub-info" style="margin-left:8px;">(${fmtPct(r.pdmRef, 1)} → ${fmtPct(r.pdm2025, 1)})</span></span>
+      <span class="fab">${r.name}<span class="sub-info" style="margin-left:8px;">(${fmtPct(r.pdmRef, 1)} → ${fmtPct(r.pdm2025, 1)} · ${fmtSignedVolK(r.deltaVol)})</span></span>
       <span class="delta neg">${fmtNum(r.delta, 2)} pts</span>
     </li>
   `).join('');
-  document.getElementById('winners-list').innerHTML = winHtml || '<li><span class="sub-info">Aucun fabricant en gain</span></li>';
-  document.getElementById('losers-list').innerHTML = loseHtml || '<li><span class="sub-info">Aucun fabricant en repli</span></li>';
+  document.getElementById('winners-list').innerHTML = winVolHtml || '<li><span class="sub-info">Aucun fabricant en gain</span></li>';
+  document.getElementById('losers-list').innerHTML = losVolHtml || '<li><span class="sub-info">Aucun fabricant en repli</span></li>';
+
+  // Winners / Losers : PDM Valeur avec traduction en €
+  const rankingVal = ranked.map(fab => {
+    const m = GEO_DATA.fabricants[fab].metrics;
+    const delta = (m.pdm_val[0] || 0) - (m.pdm_val[REF_IDX] || 0);
+    const deltaVal = (m.val[0] || 0) - (m.val[REF_IDX] || 0);
+    return { fab, name: FAB_NICE[fab] || fab, delta, deltaVal, pdmv2025: m.pdm_val[0], pdmvRef: m.pdm_val[REF_IDX] };
+  }).sort((a, b) => b.delta - a.delta);
+
+  const winVal = rankingVal.filter(r => r.delta > 0).slice(0, 5);
+  const losVal = rankingVal.filter(r => r.delta < 0).slice(-5).reverse();
+  // Format signed value : préfère M€ si ≥ 1M, sinon k€
+  const fmtSignedValSmart = (v) => {
+    const sign = v >= 0 ? '+' : '−';
+    const abs = Math.abs(v);
+    if (abs >= 1e6) return sign + (abs / 1e6).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' M€';
+    return sign + Math.round(abs / 1e3).toLocaleString('fr-FR') + ' k€';
+  };
+
+  const winValHtml = winVal.map(r => `
+    <li>
+      <span class="fab">${r.name}<span class="sub-info" style="margin-left:8px;">(${fmtPct(r.pdmvRef, 1)} → ${fmtPct(r.pdmv2025, 1)} · ${fmtSignedValSmart(r.deltaVal)})</span></span>
+      <span class="delta pos">+${fmtNum(r.delta, 2)} pts</span>
+    </li>
+  `).join('');
+  const losValHtml = losVal.map(r => `
+    <li>
+      <span class="fab">${r.name}<span class="sub-info" style="margin-left:8px;">(${fmtPct(r.pdmvRef, 1)} → ${fmtPct(r.pdmv2025, 1)} · ${fmtSignedValSmart(r.deltaVal)})</span></span>
+      <span class="delta neg">${fmtNum(r.delta, 2)} pts</span>
+    </li>
+  `).join('');
+  document.getElementById('winners-val-list').innerHTML = winValHtml || '<li><span class="sub-info">Aucun fabricant en gain</span></li>';
+  document.getElementById('losers-val-list').innerHTML = losValHtml || '<li><span class="sub-info">Aucun fabricant en repli</span></li>';
 
   // Stacked area chart (PDM Volume)
   const stackedDatasets = ranked.map(fab => {
@@ -1369,6 +1415,24 @@ function renderDistribution() {
   const ranked = getRankedFabsForTrends(GEO_DATA);
   const rankedAll = getRankedFabs(GEO_DATA);  // pour le tableau (inclut tout)
 
+  // Échelle Y commune aux 2 graphiques pour comparaison visuelle sans biais
+  let yMinAll = Infinity, yMaxAll = -Infinity;
+  ranked.forEach(fab => {
+    const m = GEO_DATA.fabricants[fab].metrics;
+    YEARS_ASC.forEach(y => {
+      const idx = YEARS.indexOf(y);
+      [m.dn[idx], m.dv[idx]].forEach(v => {
+        if (v !== null && v !== undefined && !isNaN(v)) {
+          yMinAll = Math.min(yMinAll, v);
+          yMaxAll = Math.max(yMaxAll, v);
+        }
+      });
+    });
+  });
+  // Arrondir à la dizaine inférieure / supérieure pour avoir des graduations propres
+  const yMinShared = Math.max(0, Math.floor(yMinAll / 10) * 10);
+  const yMaxShared = Math.min(100, Math.ceil(yMaxAll / 10) * 10);
+
   const makeDistribChart = (key, canvasId) => {
     const datasets = ranked.map(fab => {
       const m = GEO_DATA.fabricants[fab].metrics;
@@ -1394,7 +1458,7 @@ function renderDistribution() {
           tooltip: { backgroundColor: '#1a1a1a', callbacks: { label: ctx => `${ctx.dataset.label} : ${fmtPct(ctx.parsed.y, 1)}` } }
         },
         scales: {
-          y: { beginAtZero: false, ticks: { callback: v => v + '%' }, grid: { color: '#f0ebe0' } },
+          y: { min: yMinShared, max: yMaxShared, ticks: { callback: v => v + '%' }, grid: { color: '#f0ebe0' } },
           x: { grid: { display: false } }
         }
       }
