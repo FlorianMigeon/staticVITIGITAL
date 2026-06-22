@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Les 2 Marmottes × FPVD — Synthèse CODIR 23 juin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:        #0e1a2b;
+    --ink-soft:   #1c2a3f;
+    --paper:      #f6f1e6;
+    --paper-warm: #efe7d3;
+    --gold:       #b88a3e;
+    --gold-soft:  #d4ac6a;
+    --green:      #4a7c5e;
+    --green-soft: #6fa380;
+    --rule:       rgba(14, 26, 43, 0.18);
+    --rule-on-dk: rgba(246, 241, 230, 0.22);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #0a121f;
+    font-family: 'Manrope', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .deck { position: relative; width: 100%; min-height: 100vh; }
+  .slide {
+    width: 100%;
+    min-height: 100vh;
+    padding: 60px 76px 120px 76px;
+    display: none;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide.active { display: flex; }
+  .slide-paper { background: var(--paper); color: var(--ink); }
+  .slide-ink   { background: var(--ink);   color: var(--paper); }
+  .slide-paper::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(14,26,43,.04) 1px, transparent 1px);
+    background-size: 3px 3px; pointer-events: none; opacity: .6;
+  }
+  .slide-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+    font-weight: 500; opacity: .65; padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule); margin-bottom: 40px;
+  }
+  .slide-ink .slide-head { border-color: var(--rule-on-dk); }
+  .slide-head .num { color: var(--gold); font-weight: 600; opacity: 1; }
+
+  h1.display, h2.display, h3.display {
+    font-family: 'Cormorant Garamond', serif; font-weight: 400;
+    letter-spacing: -0.01em; line-height: 1.04;
+  }
+  h2.display { font-size: clamp(34px, 4.2vw, 58px); }
+  .eyebrow {
+    font-size: 12px; letter-spacing: .28em; text-transform: uppercase;
+    font-weight: 600; color: var(--gold); margin-bottom: 20px;
+  }
+  .lead {
+    font-size: 18px; line-height: 1.55; font-weight: 300;
+    max-width: 760px; opacity: .85;
+  }
+  em.ie {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-weight: 500; color: var(--gold);
+  }
+
+  /* ---------- SLIDE 1 : OPPORTUNITÉ ---------- */
+  .opp-top { margin-bottom: 36px; }
+  .opp-top h2 { margin-bottom: 16px; }
+
+  .opp-body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 56px;
+    align-items: start;
+  }
+
+  /* Saisonnalité visual */
+  .season {
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 30px 32px;
+    background: linear-gradient(180deg, rgba(255,255,255,.4), transparent);
+  }
+  .season .tag {
+    font-size: 11px; letter-spacing: .24em; text-transform: uppercase;
+    font-weight: 600; color: var(--gold); margin-bottom: 22px;
+  }
+  .season-chart {
+    display: flex; align-items: flex-end; gap: 6px;
+    height: 140px; margin-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0;
+  }
+  .season-chart .moncol {
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: flex-end; height: 100%; gap: 3px;
+  }
+  .bar {
+    width: 100%; border-radius: 3px 3px 0 0;
+  }
+  .bar-hot { background: linear-gradient(180deg, var(--ink), var(--ink-soft)); }
+  .bar-cold {
+    background: repeating-linear-gradient(135deg, var(--gold), var(--gold) 2px, var(--gold-soft) 2px, var(--gold-soft) 5px);
+    opacity: .9;
+  }
+  .season-labels {
+    display: flex; gap: 6px; margin-top: 8px;
+  }
+  .season-labels span {
+    flex: 1; text-align: center; font-size: 10px;
+    letter-spacing: .08em; text-transform: uppercase; opacity: .55;
+  }
+  .season-legend {
+    display: flex; gap: 24px; margin-top: 22px;
+    padding-top: 18px; border-top: 1px solid var(--rule);
+  }
+  .season-legend .li { display: flex; align-items: center; gap: 9px; font-size: 12.5px; }
+  .season-legend .sw { width: 22px; height: 11px; border-radius: 2px; }
+  .sw-hot { background: var(--ink); }
+  .sw-cold { background: repeating-linear-gradient(135deg, var(--gold), var(--gold) 2px, var(--gold-soft) 2px, var(--gold-soft) 5px); }
+  .season-cap {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 17px; margin-top: 18px; color: var(--ink); opacity: .82; line-height: 1.4;
+  }
+
+  .opp-points { display: flex; flex-direction: column; gap: 22px; }
+  .opp-point {
+    display: grid; grid-template-columns: 30px 1fr; gap: 18px;
+    padding-bottom: 22px; border-bottom: 1px solid var(--rule);
+  }
+  .opp-point:last-child { border-bottom: none; padding-bottom: 0; }
+  .opp-point .n {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 30px; color: var(--gold); line-height: 1;
+  }
+  .opp-point .ttl {
+    font-family: 'Cormorant Garamond', serif; font-size: 23px;
+    font-weight: 500; margin-bottom: 6px; line-height: 1.15;
+  }
+  .opp-point .dsc { font-size: 14px; line-height: 1.55; opacity: .8; }
+
+  /* Market data strip slide 1 */
+  .market-strip {
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .market-strip .ms-intro {
+    font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+    font-weight: 600; color: var(--gold); padding-right: 28px;
+    max-width: 160px; line-height: 1.5;
+  }
+  .market-strip .ms-items {
+    display: flex; flex: 1; gap: 0;
+  }
+  .market-strip .ms-item {
+    flex: 1; padding: 0 24px; border-left: 1px solid var(--rule);
+  }
+  .market-strip .ms-item .v {
+    font-family: 'Cormorant Garamond', serif; font-size: 30px;
+    font-weight: 500; color: var(--ink); line-height: 1; margin-bottom: 5px;
+  }
+  .market-strip .ms-item .v sup { font-size: 15px; color: var(--gold); }
+  .market-strip .ms-item .l {
+    font-size: 11px; line-height: 1.4; opacity: .68;
+  }
+  .market-strip .ms-src {
+    font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
+    opacity: .4; padding-left: 22px; writing-mode: vertical-rl; transform: rotate(180deg);
+  }
+
+  /* ---------- SLIDE 2 : RÉPONSES AUX DOUTES ---------- */
+  .doubts-top { margin-bottom: 32px; }
+  .doubts-top h2 { margin-bottom: 14px; }
+
+  .doubts-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 1px;
+    background: var(--rule-on-dk);
+    border: 1px solid var(--rule-on-dk);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .doubt {
+    background: var(--ink);
+    padding: 30px 34px;
+    display: flex; flex-direction: column;
+  }
+  .doubt .head {
+    display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px;
+  }
+  .doubt .q-label {
+    font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+    font-weight: 600; color: var(--gold-soft);
+    border: 1px solid rgba(212,172,106,.4); border-radius: 100px;
+    padding: 4px 11px;
+  }
+  .doubt h3 {
+    font-family: 'Cormorant Garamond', serif; font-size: 25px;
+    font-weight: 500; color: var(--paper); line-height: 1.12; margin-bottom: 14px;
+  }
+  .doubt .doubt-q {
+    font-size: 13px; font-style: italic; opacity: .6;
+    color: var(--paper); margin-bottom: 16px; line-height: 1.45;
+  }
+  .doubt .answer {
+    font-size: 14px; line-height: 1.58; color: var(--paper); opacity: .9;
+    margin-top: auto;
+  }
+  .doubt .answer strong { color: var(--gold-soft); font-weight: 600; }
+
+  .source-box {
+    margin-top: 14px;
+    padding: 11px 14px;
+    background: rgba(212,172,106,.09);
+    border-left: 2px solid var(--gold-soft);
+    border-radius: 0 4px 4px 0;
+  }
+  .source-box .source-tag {
+    font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+    font-weight: 700; color: var(--gold-soft); margin-bottom: 6px;
+  }
+  .source-box p {
+    font-size: 12.5px; line-height: 1.5; color: var(--paper); opacity: .82;
+  }
+  .source-box p strong { color: var(--gold-soft); font-weight: 700; }
+
+  /* ladder for bottle/pricing */
+  .ladder { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+  .ladder .rung {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11.5px; color: var(--paper);
+    padding: 5px 10px; border-radius: 3px;
+  }
+  .ladder .rung .lbl { opacity: .75; }
+  .ladder .rung .val { font-weight: 600; color: var(--gold-soft); }
+  .r1 { background: rgba(246,241,230,.05); }
+  .r2 { background: rgba(246,241,230,.09); }
+  .r3 { background: rgba(184,138,62,.22); }
+
+  .closer-line {
+    margin-top: 30px; padding-top: 26px; border-top: 1px solid var(--rule-on-dk);
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .closer-line .ask {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 22px; color: var(--paper); max-width: 720px; line-height: 1.3;
+  }
+  .closer-line .ask .accent { color: var(--gold-soft); }
+  .closer-line .who {
+    font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+    opacity: .5; text-align: right; line-height: 1.6;
+  }
+
+  /* nav */
+  .nav {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 14px; z-index: 100;
+    background: rgba(10,18,31,.82); backdrop-filter: blur(10px);
+    border: 1px solid rgba(246,241,230,.15); padding: 8px 16px;
+    border-radius: 100px; color: var(--paper);
+  }
+  .nav button {
+    background: transparent; border: none; color: var(--paper);
+    font-family: 'Manrope', sans-serif; font-size: 13px; cursor: pointer;
+    padding: 6px 10px; border-radius: 100px; transition: all .2s; letter-spacing: .05em;
+  }
+  .nav button:hover { background: rgba(246,241,230,.1); }
+  .nav button:disabled { opacity: .3; cursor: default; }
+  .nav .dots { display: flex; gap: 8px; padding: 0 8px; }
+  .nav .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(246,241,230,.25); cursor: pointer; transition: all .2s; }
+  .nav .dot.active { background: var(--gold-soft); width: 22px; border-radius: 4px; }
+  .nav .counter { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: var(--gold-soft); padding: 0 4px; min-width: 46px; text-align: center; }
+
+  @media print {
+    body { background: white; }
+    .slide { display: flex !important; page-break-after: always; min-height: 100vh; }
+    .nav { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- ============ SLIDE 1 — OPPORTUNITÉ ============ -->
+  <section class="slide slide-paper active" data-slide="1">
+    <div class="slide-head">
+      <span><span class="num">01</span> &nbsp;·&nbsp; Synthèse CODIR — 23 juin</span>
+      <span>Les 2 Marmottes × FPVD · Projet licence</span>
+    </div>
+
+    <div class="opp-top">
+      <div class="eyebrow">L'opportunité</div>
+      <h2 class="display">Sortir l'infusion de l'hiver.<br><em class="ie">Ouvrir le territoire du froid.</em></h2>
+      <p class="lead">Une infusion pétillante, sans alcool, sous licence Les 2 Marmottes — produite et distribuée par FPVD. Une réponse directe au pain point n°1 de la marque&nbsp;: la saisonnalité.</p>
+    </div>
+
+    <div class="opp-body">
+
+      <div class="season">
+        <div class="tag">Le pain point — saisonnalité</div>
+        <div class="season-chart">
+          <div class="moncol"><div class="bar bar-hot" style="height:88%"></div></div>
+          <div class="moncol"><div class="bar bar-hot" style="height:82%"></div></div>
+          <div class="moncol"><div class="bar bar-hot" style="height:60%"></div></div>
+          <div class="moncol"><div class="bar bar-hot" style="height:38%"></div><div class="bar bar-cold" style="height:14%"></div></div>
+          <div class="moncol"><div class="bar bar-hot" style="height:24%"></div><div class="bar bar-cold" style="height:30%"></div></div>
+          <div class="moncol"><div class="bar bar-hot" style="height:16%"></div><div class="bar bar-cold" style="height:46%"></div></div>
+          <div class="moncol"><div class="bar bar-hot" style="height:14%"></div><div class="bar bar-cold" style="height:52%"></div></div>
+          <div class="moncol"><div class="bar bar-hot" style="height:18%"></div><div class="bar bar-cold" style="height:44%"></div></div>
+          <div class="moncol"><div class="bar bar-hot" style="height:34%"></div><div class="bar bar-cold" style="height:24%"></div></div>
+          <div class="moncol"><div class="bar bar-hot" style="height:58%"></div></div>
+          <div class="moncol"><div class="bar bar-hot" style="height:78%"></div></div>
+          <div class="moncol"><div class="bar bar-hot" style="height:90%"></div></div>
+        </div>
+        <div class="season-labels">
+          <span>J</span><span>F</span><span>M</span><span>A</span><span>M</span><span>J</span><span>J</span><span>A</span><span>S</span><span>O</span><span>N</span><span>D</span>
+        </div>
+        <div class="season-legend">
+          <div class="li"><span class="sw sw-hot"></span> Infusion chaude (actuel)</div>
+          <div class="li"><span class="sw sw-cold"></span> Pétillante froide (à conquérir)</div>
+        </div>
+        <div class="season-cap">Le creux du printemps et de l'été&nbsp;: un territoire que la marque n'occupe pas encore.</div>
+      </div>
+
+      <div class="opp-points">
+        <div class="opp-point">
+          <div class="n">i.</div>
+          <div>
+            <div class="ttl">Un relais de croissance contra-saisonnier</div>
+            <div class="dsc">La boisson froide pétillante prend le relais quand l'infusion chaude décroche — printemps, été, consommation de journée. Le chiffre d'affaires se lisse sur l'année plutôt que de se concentrer sur l'hiver.</div>
+          </div>
+        </div>
+        <div class="opp-point">
+          <div class="n">ii.</div>
+          <div>
+            <div class="ttl">Un premier pas dans la boisson froide</div>
+            <div class="dsc">La marque entre dans une nouvelle catégorie sans renier son ADN&nbsp;: toujours la plante, l'infusion, le naturel — mais servis frais, en format partage.</div>
+          </div>
+        </div>
+        <div class="opp-point">
+          <div class="n">iii.</div>
+          <div>
+            <div class="ttl">Zéro risque industriel ou commercial</div>
+            <div class="dsc">FPVD porte la production, la distribution GMS et l'investissement. Les 2 Marmottes concèdent la marque, gardent le final cut créatif, et perçoivent des royalties.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="market-strip">
+      <div class="ms-intro">Un territoire déjà validé en GMS</div>
+      <div class="ms-items">
+        <div class="ms-item">
+          <div class="v">483<sup> M€</sup></div>
+          <div class="l">Marché du thé glacé en GMS France</div>
+        </div>
+        <div class="ms-item">
+          <div class="v">&gt;50<sup> %</sup></div>
+          <div class="l">Des foyers français acheteurs</div>
+        </div>
+        <div class="ms-item">
+          <div class="v">+5,1<sup> %</sup></div>
+          <div class="l">Croissance des boissons sans alcool</div>
+        </div>
+        <div class="ms-item">
+          <div class="v">71<sup> %</sup></div>
+          <div class="l">Des Européens réduisent l'alcool</div>
+        </div>
+      </div>
+      <div class="ms-src">Circana</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 2 — RÉPONSES AUX DOUTES ============ -->
+  <section class="slide slide-ink" data-slide="2">
+    <div class="slide-head">
+      <span><span class="num">02</span> &nbsp;·&nbsp; Synthèse CODIR — 23 juin</span>
+      <span>Lever les doutes</span>
+    </div>
+
+    <div class="doubts-top">
+      <div class="eyebrow" style="color: var(--gold-soft);">Les 4 questions du CODIR — et nos réponses</div>
+      <h2 class="display" style="color: var(--paper);">Chaque doute a <em class="ie">une réponse claire.</em></h2>
+    </div>
+
+    <div class="doubts-grid">
+
+      <div class="doubt">
+        <div class="head"><span class="q-label">Doute 1 — Brand safety</span></div>
+        <h3>Le naturel reste<br>la ligne directrice.</h3>
+        <div class="doubt-q">« Une boisson pétillante peut-elle diluer notre image santé / naturel&nbsp;? »</div>
+        <div class="answer"><strong>Sans arôme ajouté, sans additif</strong> — recette co-construite avec vos Maîtres infuseurs, sur base d'infusions et d'extraits de plantes. Bouteille pensée dans l'esprit RSE de la marque. Votre argument santé n'est pas dilué&nbsp;: il est porté dans un nouveau moment de consommation.</div>
+      </div>
+
+      <div class="doubt">
+        <div class="head"><span class="q-label">Doute 2 — Cible conso</span></div>
+        <h3>Un format qui<br>rajeunit la marque.</h3>
+        <div class="doubt-q">« Notre cœur de cible a +50 ans. Comment toucher plus jeune&nbsp;? »</div>
+        <div class="answer">La bouteille pétillante partagée, servie fraîche, parle naturellement à une clientèle <strong>plus jeune et plus festive</strong> — apéritif sans alcool, repas, moments conviviaux. Un <strong>recrutement</strong> sans abandonner le socle fidèle de l'infusion chaude.</div>
+        <div class="source-box">
+          <div class="source-tag">Source — Circana</div>
+          <p><strong>71 %</strong> des Européens réduisent leur consommation d'alcool · sans alcool <strong>+5,1 %</strong>. Plébiscité car plus rafraîchissant (55 %), plus naturel &amp; végétal (27 %), aligné au mode de vie (21 %).</p>
+        </div>
+      </div>
+
+      <div class="doubt">
+        <div class="head"><span class="q-label">Doute 3 — Type de bouteille</span></div>
+        <h3>Le contenant fait<br>la valeur perçue.</h3>
+        <div class="doubt-q">« La bouteille type vin est-elle cohérente avec notre univers&nbsp;? »</div>
+        <div class="answer" style="margin-top: 14px;">Le format champenois <strong>justifie un PMC premium</strong>. La valeur perçue suit le contenant&nbsp;:
+          <div class="ladder">
+            <div class="rung r1"><span class="lbl">Eau aromatisée</span><span class="val">€</span></div>
+            <div class="rung r2"><span class="lbl">BRSA / soft</span><span class="val">€€</span></div>
+            <div class="rung r3"><span class="lbl">Boisson hybride en bouteille viti</span><span class="val">€€€</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="doubt">
+        <div class="head"><span class="q-label">Doute 4 — Faisabilité</span></div>
+        <h3>Tout est prêt<br>côté FPVD.</h3>
+        <div class="doubt-q">« Le projet est-il réellement activable, et vite&nbsp;? »</div>
+        <div class="answer">Outil industriel, R&amp;D recette collaborative, accès rayon via les accords nationaux <strong>Veuve Ambal</strong> (DN&nbsp;48 / DV&nbsp;79), conseils juridiques mobilisés. Projet porté personnellement par <strong>Aurélien Piffaut</strong>, Président du Directoire. Une décision de principe, et l'exécution démarre.</div>
+      </div>
+
+    </div>
+
+    <div class="closer-line">
+      <div class="ask">Ce que nous demandons au CODIR&nbsp;: <span class="accent">un feu vert de principe</span> pour entrer en négociation formelle — terme de la licence, design pack via votre agence, contrat de distribution.</div>
+      <div class="who">FPVD — Famille Piffaut<br>Relance prévue mi-juillet</div>
+    </div>
+  </section>
+
+</div>
+
+<nav class="nav">
+  <button id="prev">‹ Précédent</button>
+  <div class="dots">
+    <div class="dot active" data-go="1"></div>
+    <div class="dot" data-go="2"></div>
+  </div>
+  <span class="counter"><span id="cur">01</span> / 02</span>
+  <button id="next">Suivant ›</button>
+</nav>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dots = document.querySelectorAll('.dot');
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const cur = document.getElementById('cur');
+  let i = 0; const N = slides.length;
+  function go(n){
+    i = Math.max(0, Math.min(N-1, n));
+    slides.forEach((s,k)=>s.classList.toggle('active', k===i));
+    dots.forEach((d,k)=>d.classList.toggle('active', k===i));
+    cur.textContent = String(i+1).padStart(2,'0');
+    prev.disabled = i===0; next.disabled = i===N-1;
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+  prev.addEventListener('click',()=>go(i-1));
+  next.addEventListener('click',()=>go(i+1));
+  dots.forEach(d=>d.addEventListener('click',e=>go(parseInt(e.target.dataset.go)-1)));
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown') go(i+1);
+    if(e.key==='ArrowLeft'||e.key==='PageUp') go(i-1);
+    if(e.key==='Home') go(0);
+    if(e.key==='End') go(N-1);
+  });
+  go(0);
+</script>
+</body>
+</html>
